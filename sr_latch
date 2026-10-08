@@ -1,0 +1,28 @@
+module sr_latch (input  wire S, input  wire R, output reg  Q, output reg  Qbar);
+
+    initial begin
+        Q    = 1'b0;
+        Qbar = 1'b1;
+    end
+
+    always @(*) begin
+        case ({S, R})
+            2'b00: begin
+                // Hold state: Q and Qbar maintain current values
+            end
+            2'b01: begin
+                Q    = 1'b0;      // Reset state
+                Qbar = 1'b1;
+            end
+            2'b10: begin
+                Q    = 1'b1;      // Set state
+                Qbar = 1'b0;
+            end
+            2'b11: begin
+                Q    = 1'bx;      // Invalid state
+                Qbar = 1'bx;
+            end
+        endcase
+    end
+
+endmodule
