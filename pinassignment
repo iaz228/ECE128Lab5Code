@@ -1,0 +1,13 @@
+## 100 MHz Clock Constraint (Period = 10 ns)
+set_property -dict { PACKAGE_PIN W5   IOSTANDARD LVCMOS33 } [get_ports clk_in]
+create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports clk_in]
+
+## Reset Signal (Center Push Button or Switch)
+set_property -dict { PACKAGE_PIN U18  IOSTANDARD LVCMOS33 } [get_ports rst_n]
+
+## LED Outputs
+## led[0] driven by 100 MHz clock
+set_property -dict { PACKAGE_PIN U16  IOSTANDARD LVCMOS33 } [get_ports {led[0]}]
+
+## led[1] driven by 25 MHz clock
+set_property -dict { PACKAGE_PIN E19  IOSTANDARD LVCMOS33 } [get_ports {led[1]}]
