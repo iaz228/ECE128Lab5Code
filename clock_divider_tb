@@ -1,0 +1,57 @@
+`timescale 1ns / 1ps
+
+module tb_clk_divider_25mhz;
+
+    // Testbench signals
+    reg  clk_in;
+    reg  rst_n;
+    wire clk_out;
+
+    // Instantiate the Unit Under Test (UUT)
+    clk_divider_25mhz uut (
+        .clk_in (clk_in),
+        .rst_n  (rst_n),
+        .clk_out(clk_out)
+    );
+
+    // 100 MHz Clock Generation (Period = 10 ns)
+    always #5 clk_in = ~clk_in;
+
+    // Simulation process
+    initial begin
+        // Initialize signals
+        clk_in = 0;
+        rst_n  = 0;
+
+        // Hold reset active for 25 ns
+        #25;
+        rst_n = 1; // Release reset
+
+        // Run simulation for 200 ns
+        #200;
+
+        $display("Simulation completed successfully.");
+        $finish;
+    end
+
+    // Monitor output period & frequency measurement
+    realtime t_rising_edge1, t_rising_edge2, measured_period;
+    
+    initial begin
+        // Wait for reset release
+        @(posedge rst_n);
+        
+        // Measure time between two consecutive rising edges of clk_out
+        @(posedge clk_out) t_rising_edge1 = $realtime;
+        @(posedge clk_out) t_rising_edge2 = $realtime;
+
+        measured_period = t_rising_edge2 - t_rising_edge1;
+
+        $display("--------------------------------------------------");
+        $display("Input Clock Period  : 10 ns (100 MHz)");
+        $display("Output Clock Period : %0.1f ns", measured_period);
+        $display("Output Frequency    : %0.1f MHz", 1000.0 / measured_period);
+        $display("--------------------------------------------------");
+    end
+
+endmodule
