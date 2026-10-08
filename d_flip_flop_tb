@@ -1,0 +1,61 @@
+`timescale 1ns / 1ps
+
+module tb_d_flipflop;
+
+    // Inputs to UUT
+    reg data;
+    reg clk;
+
+    // Outputs from UUT
+    wire Q;
+    wire Qnot;
+
+    // Instantiate the Unit Under Test (UUT)
+    d_flipflop uut (
+        .data (data),
+        .clk  (clk),
+        .Q    (Q),
+        .Qnot (Qnot)
+    );
+
+    // Clock Generation: 10ns period (50 MHz)
+    always #5 clk = ~clk;
+
+    initial begin
+        // Initialize inputs
+        clk  = 0;
+        data = 0;
+
+        // Monitor signal changes in console
+        $monitor("Time = %0t ns | clk = %b | data = %b | Q = %b | Qnot = %b", 
+                 $time, clk, data, Q, Qnot);
+
+        // Wait for global reset / initial settling
+        #10;
+
+        // Test 1: Set data to 1 before rising edge
+        data = 1;
+        #10; // Trigger posedge clk
+
+        // Test 2: Set data to 0 before rising edge
+        data = 0;
+        #10; // Trigger posedge clk
+
+        // Test 3: Change data mid-cycle (glitch check)
+        // Data changes at 33ns, output should only change at posedge (40ns)
+        #3;
+        data = 1;
+        #2;
+        data = 0;
+        #2;
+        data = 1; 
+        #10; // Trigger posedge clk
+
+        // Test 4: Maintain data low
+        data = 0;
+        #20;
+
+        $finish;
+    end
+
+endmodule
