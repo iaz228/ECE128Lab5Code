@@ -1,0 +1,35 @@
+module sr_flipflop (
+    input  wire clk,    // Clock signal
+    input  wire rst,    // Asynchronous Reset (active high)
+    input  wire S,      // Set input
+    input  wire R,      // Reset input
+    output reg  Q,      // Output
+    output reg  Qbar    // Complementary output
+);
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            Q    <= 1'b0;
+            Qbar <= 1'b1;
+        end else begin
+            case ({S, R})
+                2'b00: begin
+                    // Hold state
+                end
+                2'b01: begin
+                    Q    <= 1'b0; // Reset state
+                    Qbar <= 1'b1;
+                end
+                2'b10: begin
+                    Q    <= 1'b1; // Set state
+                    Qbar <= 1'b0;
+                end
+                2'b11: begin
+                    Q    <= 1'bx; // Invalid state
+                    Qbar <= 1'bx;
+                end
+            endcase
+        end
+    end
+
+endmodule
