@@ -1,0 +1,43 @@
+`timescale 1ns / 1ps
+
+module counter_3bit_tb;
+
+    // Reg signals drive inputs to the DUT
+    reg clk;
+    reg rst_n;
+
+    // Wire signals capture outputs from the DUT
+    wire [2:0] q;
+
+    // Instantiate Design Under Test (DUT)
+    counter_3bit dut (
+        .clk  (clk),
+        .rst_n(rst_n),
+        .q    (q)
+    );
+
+    // Clock generation: 100 MHz (Period = 10ns)
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("counter_3bit.vcd");
+        $dumpvars(0, counter_3bit_tb);
+
+        // Signal initialization
+        clk   = 1'b0;
+        rst_n = 1'b0; // Assert reset
+
+        #15;
+        rst_n = 1'b1; // Release reset
+
+        #100;
+        $finish;
+    end
+
+    // Display simulation results
+    initial begin
+        $monitor("Time = %0t ns | rst_n = %b | Counter Output (q) = %d (%3b)", 
+                 $time, rst_n, q, q);
+    end
+
+endmodule
