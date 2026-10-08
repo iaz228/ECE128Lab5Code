@@ -1,0 +1,47 @@
+module t_ff (
+    input  wire clk,
+    input  wire rst_n, // Active-low asynchronous reset
+    input  wire t,
+    output reg  q
+);
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            q <= 1'b0;
+        end else begin
+            if (t)
+                q <= ~q;
+            else
+                q <= q;
+        end
+    end
+
+endmodule
+
+module clk_divider_25mhz (
+    input  wire clk_in,   // 100 MHz input clock
+    input  wire rst_n,    // Active-low asynchronous reset
+    output wire clk_out   // 25 MHz output clock
+);
+
+    // Internal net connecting the first stage to the second stage
+    wire q0;
+
+    // First TFF stage: divides 100MHz by 2 -> 50MHz
+    t_ff ff0 (
+        .clk  (clk_in),
+        .rst_n(rst_n),
+        .t    (1'b1),     // Always toggles on rising clock edge
+        .q    (q0)
+    );
+
+    // Second TFF stage: divides 50MHz by 2 -> 25MHz
+    // Using q0 as the clock source for synchronous toggle division
+    t_ff ff1 (
+        .clk  (q0),
+        .rst_n(rst_n),
+        .t    (1'b1),     // Always toggles on rising edge of q0
+        .q    (clk_out)
+    );
+
+endmodule
